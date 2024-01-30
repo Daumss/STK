@@ -15,7 +15,6 @@ public class player : MonoBehaviour
     public uint xp;
     public uint lvupxp;
     private float nohurttime = (float)0.02;
-    public int attackpower = 1;
     private bool IsGround;
     [HideInInspector] public bool attacking;
     [HideInInspector] public bool IsHurt;
@@ -53,23 +52,23 @@ public class player : MonoBehaviour
             lv++;
             xp = 0;
             nohurttime += 0.015f;
-            attackpower++;
             Maxhealth++;
             CurrentHealth++;
             Speed+=0.5f;
         }
         else if (!Input.GetKey(KeyCode.LeftArrow) && !Input.GetKey(KeyCode.RightArrow) & IsHurt == true && attacking == false)//hurt
         {
+            Moveing=new Vector2 (-0.1f, 0);
             am.Play("hurt" + lv);
         }
         else if (Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.UpArrow) && IsHurt == false && attacking == false)//right move
         {
-            Moveing = new Vector2(1, 0);
+            Moveing = Vector2.right;
             am.Play("walk" + lv);
         }
         else if (Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.UpArrow) && IsHurt == true)//right move and hurt
         {
-            Moveing = new Vector2(1, 0);
+            Moveing = Vector2.right;
             am.Play("walkhurt" + lv);
         }
         else if (Input.GetKey(KeyCode.RightArrow) && Input.GetKey(KeyCode.UpArrow) && IsHurt == false && attacking == false)//right run
@@ -84,12 +83,12 @@ public class player : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.LeftArrow) && !Input.GetKey(KeyCode.UpArrow) && IsHurt == false && attacking == false)//left move
         {
-            Moveing = new Vector2(-1, 0);
+            Moveing = Vector2.left;
             am.Play("walk" + lv);
         }
         else if (Input.GetKey(KeyCode.LeftArrow) && !Input.GetKey(KeyCode.UpArrow) && IsHurt == true)//left move and hurt
         {
-            Moveing = new Vector2(-1, 0);
+            Moveing = Vector2.left;
             am.Play("walkhurt" + lv);
         }
         else if (Input.GetKey(KeyCode.LeftArrow) && Input.GetKey(KeyCode.UpArrow) && IsHurt == false && attacking == false)//left run
@@ -117,7 +116,7 @@ public class player : MonoBehaviour
             rb.AddForce(Vector2.up * Speed,ForceMode2D.Impulse);
         }
 
-        rb.AddForce(Speed * Moveing,ForceMode2D.Impulse);
+        //rb.AddForce(Moveing,ForceMode2D.Impulse);
     }
 
     public IEnumerator hurt(int hurtpower)
