@@ -1,14 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class player : MonoBehaviour
 {
     public short lv = 1;
     public int Maxhealth;
     public int CurrentHealth;
-    Vector2 Moveing;
+    public Vector2 Moveing;
+
     public float Speed = 2f;
     private Rigidbody2D rb;
     private Animator am;
@@ -18,6 +18,7 @@ public class player : MonoBehaviour
     private bool IsGround;
     [HideInInspector] public bool attacking;
     [HideInInspector] public bool IsHurt;
+    private GameObject Healthbar;
 
     // Start is called before the first frame update
     void Start()
@@ -25,18 +26,22 @@ public class player : MonoBehaviour
         CurrentHealth = Maxhealth;
         rb = GetComponent<Rigidbody2D>();
         am = GetComponent<Animator>();
+        Healthbar = GameObject.Find("health");
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (CurrentHealth == 0)
+        {
+            transform.position = Vector2.zero;
+            am.Play("lvup");
+            CurrentHealth = Maxhealth;
+            Healthbar.GetComponent<hp>().UpdateHealthbar();
+        }
         if (Input.GetKeyDown(KeyCode.P))
         {
-            attacking = true;
-        }
-        else if (!Input.GetKey(KeyCode.P))
-        {
-            attacking = false;
+            Attack();
         }
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
@@ -54,11 +59,12 @@ public class player : MonoBehaviour
             nohurttime += 0.015f;
             Maxhealth++;
             CurrentHealth++;
-            Speed+=0.5f;
+            Speed += 0.5f;
+            Healthbar.GetComponent<hp>().UpdateHealthbar();
         }
         else if (!Input.GetKey(KeyCode.LeftArrow) && !Input.GetKey(KeyCode.RightArrow) & IsHurt == true && attacking == false)//hurt
         {
-            Moveing=new Vector2 (-0.1f, 0);
+            Moveing = new Vector2(-0.1f, 0);
             am.Play("hurt" + lv);
         }
         else if (Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.UpArrow) && IsHurt == false && attacking == false)//right move
@@ -108,23 +114,31 @@ public class player : MonoBehaviour
         }
         else
         {
-            Moveing = new Vector2(0, 0);
+            Moveing = Vector2.zero;
             am.Play("idle" + lv);
         }
-        if (Input.GetKeyDown(KeyCode.Space)&& IsGround==true) //jump
+        if (Input.GetKeyDown(KeyCode.Space) && IsGround == true) //jump
         {
-            rb.AddForce(Vector2.up * Speed,ForceMode2D.Impulse);
+            rb.AddForce(Vector2.up * Speed, ForceMode2D.Impulse);
         }
 
-        //rb.AddForce(Moveing,ForceMode2D.Impulse);
+        rb.AddForce(Moveing, ForceMode2D.Impulse);
     }
 
     public IEnumerator hurt(int hurtpower)
     {
-        IsHurt = true;
-        CurrentHealth -= hurtpower;
-        yield return new WaitForSeconds(nohurttime);
-        IsHurt = false;
+            IsHurt = true;
+            CurrentHealth -= hurtpower;
+            Healthbar.GetComponent<hp>().UpdateHealthbar();
+            yield return new WaitForSeconds(nohurttime);
+            IsHurt = false;
+    }
+
+    private IEnumerable Attack()
+    {
+        attacking = true;
+        yield return new WaitForSeconds(0.7f);
+        attacking = false;
     }
 
     void OnCollisionEnter2D(Collision2D collision)
