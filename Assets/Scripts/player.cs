@@ -7,7 +7,7 @@ public class player : MonoBehaviour
     public short lv = 1;
     public int Maxhealth;
     public int CurrentHealth;
-    public Vector2 Moveing;
+    private Vector2 Moveing;
 
     public float Speed = 2f;
     private Rigidbody2D rb;
@@ -27,6 +27,7 @@ public class player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         am = GetComponent<Animator>();
         Healthbar = GameObject.Find("health");
+        Healthbar.GetComponent<hp>().UpdateHealthbar();
     }
 
     // Update is called once per frame
@@ -119,10 +120,11 @@ public class player : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Space) && IsGround == true) //jump
         {
-            rb.AddForce(Vector2.up * Speed, ForceMode2D.Impulse);
+            rb.AddForceY(Speed,ForceMode2D.Impulse);
         }
 
-        rb.AddForce(Moveing, ForceMode2D.Impulse);
+        //rb.AddForce(Moveing, ForceMode2D.Impulse);
+        rb.MovePosition(Moveing*Speed * Time.deltaTime + new Vector2(transform.position.x, transform.position.y));
     }
 
     public IEnumerator hurt(int hurtpower)
